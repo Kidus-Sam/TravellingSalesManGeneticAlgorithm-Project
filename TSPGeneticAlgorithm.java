@@ -71,9 +71,9 @@ public class TSPGeneticAlgorithm {
             StringBuilder sb = new StringBuilder();
             sb.append("[");
             for (int i = 0; i < cities.length; i++) {
-                sb.append(cities[i]);
+                sb.append(cityNames.get(cities[i]));
                 if (i < cities.length - 1) {
-                    sb.append(", ");
+                    sb.append("-> ");
                 }
             }
             sb.append("]");
