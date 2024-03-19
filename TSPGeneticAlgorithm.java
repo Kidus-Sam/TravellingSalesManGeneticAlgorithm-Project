@@ -28,6 +28,7 @@ public class TSPGeneticAlgorithm {
         }
 
         public Individual crossover(Individual other) {
+            visited.clear();
             int[] childCities = new int[cities.length];
             int crossoverPoint = new Random().nextInt(cities.length);
             for (int i = 0; i < cities.length; i++) {
@@ -37,6 +38,7 @@ public class TSPGeneticAlgorithm {
                     }
                     else{
                         childCities[i] = cities[i];
+                        visited.add(cities[i]);
                     }
                 } else {
                     if(visited.contains(other.cities[i])){
@@ -44,6 +46,7 @@ public class TSPGeneticAlgorithm {
                     }
                     else{
                         childCities[i] = other.cities[i];
+                        visited.add(other.cities[i]);
                     }
                 }
             }
@@ -91,28 +94,32 @@ public class TSPGeneticAlgorithm {
         try{
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         int N = Integer.parseInt(reader.readLine());
+        System.out.println(N);
         cityNames = new ArrayList<>();
         costs = new int[N][N];
         for (int i = 0; i < N; i++) {
             String cityName = reader.readLine();
             cityNames.add(cityName);
+            System.out.println(cityName);
             int[] cityCosts = new int[N];
             Arrays.fill(cityCosts, Integer.MAX_VALUE);
             costs[i] = cityCosts;
         }
         for (int i = 0; i < N; i++) {
+            System.out.println("");
             String[] line = reader.readLine().split(" ");
             for (int j = 0; j < N; j++) {
                 costs[i][j] = Integer.parseInt(line[j]);
+                System.out.print(line[j]+" ");
             }
         }
+        System.out.println("");
         reader.close();
         input.close();
 
         populationSize = 2 * N;
         mutationRate = 0.05;
-        generations = 100;
-        System.out.println(populationSize);
+        generations = 1000;
         Individual[] population = new Individual[populationSize];
         for (int i = 0; i < populationSize; i++) {
             int[] cities = new int[N];
@@ -123,25 +130,31 @@ public class TSPGeneticAlgorithm {
             population[i] = new Individual(cities);
         }
         Individual best = population[0];
+        Individual best2;
         for (int i = 0; i < generations; i++) {
-            Individual best2=population[0];
+            best2=population[0];
             for (int j = 1; j < population.length-1; j++) {
-                if(!(population[j]==null)){
+            
                     if (population[j].fitness < best.fitness) {
                         best = population[j];
                     }
                     if(population[j].fitness<best2.fitness){
                         best2=population[j];
                     }
-                }
+                
             }
-            System.out.println("Generation " + i + ": " + best2.fitness);
+            System.out.println("Generation " + i + " best cost: " + best2.fitness);
 
             ArrayList<Individual> newPopulation = new ArrayList<Individual>(populationSize);
             for (int j = 0; j < populationSize / 2; j++) {
                 Individual parent1 = select(population);
                 Individual parent2 = select(population);
                 Individual child = parent1.crossover(parent2);
+                while(child==null){
+                    parent1 = select(population);
+                    parent2 = select(population);
+                    child = parent1.crossover(parent2);
+                }
                 if (new Random().nextDouble() < mutationRate) {
                     child = child.mutate();
                 }
@@ -160,7 +173,7 @@ public class TSPGeneticAlgorithm {
         System.out.println("Best path cost: " + best.fitness);
         }
         catch(Exception e){
-            System.out.println("Please input an existing file name");
+            System.out.println("Please input an existing file name"+ e);
         }
     }
 
